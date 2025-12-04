@@ -9,40 +9,45 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// ... 原本的 import ...
+// 1️⃣ 【新增】這就是你的筆記本，用來存最近的訊息
+let messageHistory = [];
 
-let subscriptions = [];
+// ... 中間可能還有 subscribe 的程式碼 ...
 
-// ✨ 1. 新增：用來存歷史訊息的陣列
-let messageHistory = []; 
-
-// ... 原本的 subscribe API ...
-
-// ✨ 2. 新增：提供 API 讓前端「讀取歷史訊息」
+// 2️⃣ 【新增】開放查詢窗口 (GET 方法)
+// 前端只要呼叫這個網址，後端就會把 messageHistory 丟給它
 app.get('/messages', (req, res) => {
+    // 回傳目前的歷史訊息
     res.json(messageHistory);
 });
 
+
+// 3️⃣ 【修改】原本的推播 API (POST /broadcast)
 app.post('/broadcast', (req, res) => {
     const { title, message, url } = req.body;
 
-    // ✨ 3. 修改：在發送推播的同時，把內容存起來
+    // --- 👇 新增這段：把新訊息存起來 👇 ---
     const newMessage = {
         title: title,
         message: message,
-        time: new Date().toLocaleString(), // 加上時間
-        url: url
+        time: new Date().toLocaleString(), // 自動加上現在時間
+        url: url || '#'
     };
 
-    // 把新訊息加到「最前面」 (unshift)
+    // unshift 代表「加在最前面」，這樣最新的會在第一個
     messageHistory.unshift(newMessage);
 
-    // 只保留最新 3 則 (如果超過 3 則，就把舊的切掉)
+    // 如果超過 3 筆，就把最後面(最舊)的刪掉
     if (messageHistory.length > 3) {
-        messageHistory = messageHistory.slice(0, 3);
+        messageHistory.pop();
     }
+    console.log('📚 已更新公告板，目前有', messageHistory.length, '則訊息');
+    // -------------------------------------
 
-    // ... 下面接原本的發送推播程式碼 ...
+    // ... 下面接原本發送 webpush 的程式碼 ...
+    const notificationPayload = JSON.stringify({ ... });
+    // ...
+});
 
 // 🔑 你的 VAPID Keys (請確認這裡是你最新的 key)
 const publicVapidKey = 'BA9EFqigQF0HLsJisQtvcbWrjAvtz14BT9DKwaygnNJR51kPnY-TwH9Ui94sLEzZOS4FdOiXI-OKAUl1A2Mh-Fc';
