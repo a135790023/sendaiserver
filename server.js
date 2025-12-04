@@ -48,4 +48,7 @@ app.post('/broadcast', (req, res) => {
 
 // ⭐ 關鍵：使用雲端分配的 Port
 const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Server started on port ${port}`));
+// 加入 '0.0.0.0' 參數，讓它接受來自任何 IP 的連線
+app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Server started on port ${port}`);
+});
