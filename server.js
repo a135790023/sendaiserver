@@ -65,7 +65,7 @@ app.post('/broadcast', (req, res) => {
     const newMessage = {
         title: title,
         message: message,
-        time: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })
+        time: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
         url: url || '#'
     };
 
